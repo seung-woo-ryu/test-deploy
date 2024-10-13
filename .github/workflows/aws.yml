@@ -27,7 +27,9 @@ jobs:
     - name: Set up JDK 17
       uses: actions/setup-java@v4.4.0
       with:
+        distribution: 'temurin' # 배포판을 지정해야 함
         java-version: '17'
+        java-package: jdk
 
     - name: Build with Gradle
       run: ./gradlew build -x test
