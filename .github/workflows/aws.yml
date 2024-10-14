@@ -46,15 +46,6 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    # - name: Build, tag, and push image to Amazon ECR
-    #   id: build-image
-    #   env:
-    #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-    #     IMAGE_TAG: ${{ github.sha }}
-    #   run: |
-    #     cp build/libs/${{ env.JAR_FILE_NAME }} ${{ env.TARGET_FILE_NAME }}
-    #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-    #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Get list of image digests
       run: |
         REPO_NAME="klol/was"  # ECR 저장소 이름
@@ -66,14 +57,14 @@ jobs:
           echo "Deleting all images..."
           aws ecr batch-delete-image --repository-name $REPO_NAME --image-ids "$IMAGE_DIGESTS"
         fi
-
-    - name: Confirm deletion
+    
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        REPO_NAME="your-ecr-repository-name"
-        REMAINING_IMAGES=$(aws ecr list-images --repository-name $REPO_NAME --query 'imageIds[*]' --output json)
-        
-        if [[ $REMAINING_IMAGES == "[]" ]]; then
-          echo "All images deleted successfully."
-        else
-          echo "Some images still remain."
-        fi
+        cp build/libs/${{ env.JAR_FILE_NAME }} ${{ env.TARGET_FILE_NAME }}
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
