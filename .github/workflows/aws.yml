@@ -79,7 +79,7 @@ jobs:
         --application-name $APPLICATION_NAME \
         --deployment-group-name $DEPLOYMENT_GROUP_NAME \
         --github-location commitId=$COMMIT_ID,repository=$repository \
-        --file-exists-behaivor OVERWRITE
+        --file-exists-behavior OVERWRITE
         
         
     
